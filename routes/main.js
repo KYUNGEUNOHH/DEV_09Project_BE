@@ -81,31 +81,19 @@ router.get('/postlist', (req, res) => {
     const sql = "SELECT * FROM Post WHERE address LIKE ? ORDER BY createdAt DESC"
     let headList = [];
 
-    db.query(sql, addr, (err, data) => {
+    db.query(sql, addr, (err, main) => {
         if (err) console.log(err);
 
-        const sql = "SELECT * FROM JoinPost WHERE Post_postId=?"
-       
-
-        db.query(sql, data[0].postId, (err, headlist) => {
-            for(head of headlist){
-                console.
-                console.log(head.User_userId)
-                headList.push(head.User_userId)
-            }
+        for (list of main) {
+            const sql = "SELECT P.*, GROUP_CONCAT(U.userId SEPARATOR ',') HeadList FROM `Post` P INNER JOIN `JoinPost` JP ON P.postId = JP.Post_postId INNER JOIN `User` U  ON JP.User_userId = U.userId WHERE P.postId =?"
+            const postid = list.postId
             
-            // console.log(headList)
-            // console.log(data[0].headList)
-            // data[0].headList = headList
-
-        })
-
-        const doc = {data, headList}
-        console.log(headList)
-        res.send({ msg: 'success', doc });
-    });
-
-
+            db.query(sql, postid, (err, data) => {
+                data[0].HeadList = data[0].HeadList.split(',').map(id => Number(id))
+                res.send({ msg: 'success', data });
+            });
+        }   
+    })
 
 });
 
