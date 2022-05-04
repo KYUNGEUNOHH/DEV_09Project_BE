@@ -38,16 +38,17 @@ router.post('/postadd', authMiddleware, upload.single('image'), (req, res, next)
         const sql =
             'INSERT INTO Post (`title`, `content`, `price`, `headCount`, `category`, `endTime`, `address`, `lat`, `lng`, `writer`, `User_userId`, `image`, `isDone`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,false)';
 
-        console.log(sql)
-
         db.query(sql, datas, (err, rows) => {
             if (err) {
                 console.log(err);
-                res.status(201).send({ msg: 'fail' });
+                res.send({ msg: 'fail' });
             } else {
-                console.log(rows.insertId)
-                db.query('SELECT * FROM Post WHERE `postId`=?',rows.insertId, (err, row) => {
-                res.status(201).send({ msg: 'success', row });
+                db.query('INSERT INTO `JoinPost` (`Post_postId`, `User_userId`) VALUES (?,?)',[rows.insertId, User_userId], (err, join) => {
+                    console.log("joinPost에 저장")
+                })
+
+                db.query('SELECT * FROM `Post` WHERE postId =?',rows.insertId, (err, row) => {
+                    res.send({ msg: 'success', row});
                 })
             }
         });
@@ -72,16 +73,40 @@ router.delete('/:postId', authMiddleware, (req, res, next) => {
 // 메인페이지 게시글 불러오기
 router.get('/postlist', (req, res) => {
     const address = req.body.address.split(' ');
-    const fineAddr = address[0]+' '+address[1]+' '+address[2]
+    const findAddr = address[0]+' '+address[1]+' '+address[2]
 
-    const addr = fineAddr +'%'
+    console.log(findAddr)
+
+    const addr = findAddr +'%'
     const sql = "SELECT * FROM Post WHERE address LIKE ? ORDER BY createdAt DESC"
+    let headList = [];
 
     db.query(sql, addr, (err, data) => {
         if (err) console.log(err);
-        console.log(data);
-        res.status(201).send({ msg: 'success', data });
+
+        const sql = "SELECT * FROM JoinPost WHERE Post_postId=?"
+       
+
+        db.query(sql, data[0].postId, (err, headlist) => {
+            for(head of headlist){
+                console.
+                console.log(head.User_userId)
+                headList.push(head.User_userId)
+            }
+            
+            // console.log(headList)
+            // console.log(data[0].headList)
+            // data[0].headList = headList
+
+        })
+
+        const doc = {data, headList}
+        console.log(headList)
+        res.send({ msg: 'success', doc });
     });
+
+
+
 });
 
 // 메인페이지 게시글 상세보기

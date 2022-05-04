@@ -8,7 +8,6 @@ const db = require('../config');
 const authMiddleware = require('../middlewares/auth');
 
 
-
 //거래 참여자 추가 (방장만 권한)
 router.post('/deal/add/:userId', authMiddleware, (req, res, next) => {
     const postId = req.body.postId
