@@ -223,27 +223,40 @@ router.get('/:userId', authMiddleware, (req, res) => {
         if (err) console.log(err)
     
     const buylist =
-        "SELECT P.postId, P.User_userId userId, P.title, P.content, P.writer, P.price, P.headCount, P.category, P.isDone, P.image, P.address, P.endTime, GROUP_CONCAT(U.userId SEPARATOR ',') headList FROM `Post` P LEFT OUTER JOIN `JoinPost` JP ON P.postId = JP.Post_postId and isPick=1 LEFT OUTER JOIN `User` U ON JP.User_userId = U.userId WHERE P.category = 'buy' and P.User_userId = ? GROUP BY P.postId, P.User_userId, P.title, P.content, P.writer, P.price, P.headCount, P.category, P.isDone, P.image, P.address, P.endTime ORDER BY P.createdAt DESC";
-    db.query(buylist, [userId], (err, data) => {
+        "SELECT P.postId, P.User_userId userId, P.title, P.content, P.writer, P.price, P.headCount, P.category, P.isDone, P.image, P.address, P.endTime, GROUP_CONCAT(DISTINCT U.userId SEPARATOR ',') headList FROM `Post` P LEFT OUTER JOIN `JoinPost` JP ON P.postId = JP.Post_postId and isPick=1 LEFT OUTER JOIN `User` U ON JP.User_userId = U.userId WHERE P.category = 'buy' and P.User_userId = ? GROUP BY P.postId, P.User_userId, P.title, P.content, P.writer, P.price, P.headCount, P.category, P.isDone, P.image, P.address, P.endTime ORDER BY P.createdAt DESC";
+        
+    db.query(buylist, [userId], (err, buyList) => {
         if (err) console.log(err);
-        for (list of data) {
+        for (list of buyList) {
             let head = list.headList;
             let newList = [];
 
-            if (isNaN(Number(head))) {
-                newList.push(list.User_userId);
-                head.split(',').map(id => newList.push(Number(id)));
+            if (list.headList !== null) {
+                newList.push(list.userId);
                 list.headList = newList;
             } else {
-                newList.push(list.User_userId);
                 list.headList = newList;
             }
+            
         }
 
     const eatlist =
-        'SELECT * FROM Post WHERE `User_userId`= ? and `category`="eat"';
+        "SELECT P.postId, P.User_userId userId, P.title, P.content, P.writer, P.price, P.headCount, P.category, P.isDone, P.image, P.address, P.endTime, GROUP_CONCAT(DISTINCT U.userId SEPARATOR ',') headList FROM `Post` P LEFT OUTER JOIN `JoinPost` JP ON P.postId = JP.Post_postId and isPick=1 LEFT OUTER JOIN `User` U ON JP.User_userId = U.userId WHERE P.category = 'eat' and P.User_userId = ? GROUP BY P.postId, P.User_userId, P.title, P.content, P.writer, P.price, P.headCount, P.category, P.isDone, P.image, P.address, P.endTime ORDER BY P.createdAt DESC";
+
     db.query(eatlist, [userId], (err, eatList) => {
         if (err) console.log(err);
+        for (list of eatList) {
+            let head = list.headList;
+            let newList = [];
+
+            if (list.headList !== null) {
+                newList.push(list.userId);
+                list.headList = newList;
+            } else {
+                list.headList = newList;
+            }
+                
+        }
 
     const likelist = 
         'SELECT * FROM `Like` WHERE `User_userId`= ?';
