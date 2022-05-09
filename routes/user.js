@@ -259,7 +259,8 @@ router.get('/:userId', authMiddleware, (req, res) => {
         }
 
     const likelist = 
-        'SELECT * FROM `Like` WHERE `User_userId`= ?';
+        "SELECT P.postId, P.User_userId userId, P.title, P.content, P.writer, P.price, P.headCount, P.category, P.isDone, P.image, P.address, P.endTime, GROUP_CONCAT(DISTINCT U.userId SEPARATOR ',') headList FROM `Post` P LEFT OUTER JOIN `JoinPost` JP ON P.postId = JP.Post_postId and isPick=1 LEFT OUTER JOIN `User` U ON JP.User_userId = U.userId WHERE P.category = 'eat' and P.User_userId = ? GROUP BY P.postId, P.User_userId, P.title, P.content, P.writer, P.price, P.headCount, P.category, P.isDone, P.image, P.address, P.endTime ORDER BY P.createdAt DESC"
+        // 'SELECT * FROM `Like` WHERE `User_userId`= ?';
     db.query(likelist, [userId], (err, likeList) => {
         if (err) console.log(err);
     
