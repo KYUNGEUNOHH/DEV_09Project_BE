@@ -207,4 +207,55 @@ router.get('/islogin', authMiddleware, async (req, res) => {
     });
 });
 
+// const sql =
+//             "SELECT P.postId, P.User_userId, P.title, P.content, P.writer, P.price, P.headCount, P.category, P.isDone, P.image, P.lat, P.lng, P.address, P.createdAt, P.endTime, GROUP_CONCAT(U.userId SEPARATOR ',') headList, CASE WHEN GROUP_CONCAT(L.User_userId) is null THEN false ELSE true END isLike FROM `Post` P LEFT OUTER JOIN `JoinPost` JP ON P.postId = JP.Post_postId and isPick=1 LEFT OUTER JOIN `User` U ON JP.User_userId = U.userId LEFT OUTER JOIN `Like` L ON L.Post_postId = P.postId and L.User_userId = ? WHERE `address` like ? and isDone = 0 GROUP BY P.postId, P.User_userId, P.title, P.content, P.writer, P.price, P.headCount, P.category, P.isDone, P.image, P.lat, P.lng, P.address, P.createdAt, P.endTime ORDER BY P.createdAt DESC";
+
+//         d
+
+
+//유저 마이페이지 (참여한 게시판 조회) *** 자신의 것 조회할때랑 다른사람것 조회할때를... 프론트와 의논.
+router.get('/:userId', authMiddleware, (req, res) => {
+    const userId = req.params.userId;
+
+    const userinfo = 
+        "SELECT U.userId, U.userEmail, U.userName, U.userImage, U.tradeCount FROM `User` U WHERE `userId`=?";
+    db.query(userinfo, userId,(err, userInfo) =>{
+        if (err) console.log(err)
+    
+    const buylist =
+        "SELECT P.postId, P.User_userId userId, P.title, P.content, P.writer, P.price, P.headCount, P.category, P.isDone, P.image, P.address, P.endTime, GROUP_CONCAT(U.userId SEPARATOR ',') headList FROM `Post` P LEFT OUTER JOIN `JoinPost` JP ON P.postId = JP.Post_postId and isPick=1 LEFT OUTER JOIN `User` U ON JP.User_userId = U.userId WHERE P.category = 'buy' and P.User_userId = ? GROUP BY P.postId, P.User_userId, P.title, P.content, P.writer, P.price, P.headCount, P.category, P.isDone, P.image, P.address, P.endTime ORDER BY P.createdAt DESC";
+    db.query(buylist, [userId], (err, data) => {
+        if (err) console.log(err);
+        for (list of data) {
+            let head = list.headList;
+            let newList = [];
+
+            if (isNaN(Number(head))) {
+                newList.push(list.User_userId);
+                head.split(',').map(id => newList.push(Number(id)));
+                list.headList = newList;
+            } else {
+                newList.push(list.User_userId);
+                list.headList = newList;
+            }
+        }
+
+    const eatlist =
+        'SELECT * FROM Post WHERE `User_userId`= ? and `category`="eat"';
+    db.query(eatlist, [userId], (err, eatList) => {
+        if (err) console.log(err);
+
+    const likelist = 
+        'SELECT * FROM `Like` WHERE `User_userId`= ?';
+    db.query(likelist, [userId], (err, likeList) => {
+        if (err) console.log(err);
+    
+        
+        res.status(201).send({ msg: 'success', userInfo, buyList, eatList ,likeList});
+    })  
+    })
+    })
+    })
+});
+
 module.exports = router;
