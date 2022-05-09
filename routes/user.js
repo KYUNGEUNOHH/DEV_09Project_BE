@@ -231,14 +231,15 @@ router.get('/:userId', authMiddleware, (req, res) => {
     db.query(mylist, userId, (err, myList) => {
         if (err) console.log(err);
         for (list of myList) {
-            console.log(list)
             let head = list.headList; 
             let newList = [];
 
             if (list.headList !== null) {
                 newList.push(list.userId);
+                head.split(',').map(id => newList.push(Number(id)))
                 list.headList = newList;
             } else {
+                newList.push(list.userId);
                 list.headList = newList;
             }
             
@@ -257,8 +258,10 @@ router.get('/:userId', authMiddleware, (req, res) => {
 
             if (list.headList !== null) {
                 newList.push(list.userId);
+                head.split(',').map(id => newList.push(Number(id)))
                 list.headList = newList;
             } else {
+                newList.push(list.userId);
                 list.headList = newList;
             }
                 
@@ -267,7 +270,7 @@ router.get('/:userId', authMiddleware, (req, res) => {
 
     // 유저의 좋아요 리스트
     const likelist = 
-        "SELECT P.postId, P.User_userId userId, P.title, P.content, P.writer, P.price, P.headCount, P.category, P.isDone, P.image, P.address, P.endTime, GROUP_CONCAT(DISTINCT U.userId SEPARATOR ',') headList FROM `Post` P LEFT OUTER JOIN `JoinPost` JP ON P.postId = JP.Post_postId and isPick=1 LEFT OUTER JOIN `User` U ON JP.User_userId = U.userId  LEFT OUTER JOIN `Like` L ON P.postId = L.Post_postId WHERE L.User_userId = ? GROUP BY P.postId, P.User_userId, P.title, P.content, P.writer, P.price, P.headCount, P.category, P.isDone, P.image, P.address, P.endTime ORDER BY P.createdAt DESC"
+        "SELECT P.postId, P.User_userId userId, P.title, P.content, P.writer, P.price, P.headCount, P.category, P.isDone, P.image, P.address, P.endTime, GROUP_CONCAT(DISTINCT U.userId SEPARATOR ',') headList FROM `Post` P LEFT OUTER JOIN `JoinPost` JP ON P.postId = JP.Post_postId and isPick=1 LEFT OUTER JOIN `User` U ON JP.User_userId = U.userId  LEFT OUTER JOIN `Like` L ON P.postId = L.Post_postId WHERE L.User_userId = ? GROUP BY P.postId, P.User_userId, P.title, P.content, P.writer, P.price, P.headCount, P.category, P.isDone, P.image, P.address, P.endTime ORDER BY P.endTime DESC"
 
     db.query(likelist, userId, (err, likeList) => {
         if (err) console.log(err);
@@ -277,8 +280,10 @@ router.get('/:userId', authMiddleware, (req, res) => {
 
             if (list.headList !== null) {
                 newList.push(list.userId);
+                head.split(',').map(id => newList.push(Number(id)))
                 list.headList = newList;
             } else {
+                newList.push(list.userId);
                 list.headList = newList;
             }
                 
