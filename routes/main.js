@@ -6,8 +6,9 @@ require('moment-timezone');
 moment.tz.setDefault('Asia/seoul');
 
 const authMiddleware = require('../middlewares/auth');
-
 const upload = require('../S3/s3');
+const sharp = require("sharp");
+const { fstat } = require('fs');
 
 //게시글 작성
 router.post('/postadd', authMiddleware, upload.single('image'), (req, res, next) => {
@@ -16,7 +17,30 @@ router.post('/postadd', authMiddleware, upload.single('image'), (req, res, next)
         const writer = res.locals.user.userName;
         const User_userId = res.locals.user.userId;
 
+        // const image = req.file?.location;
+        // const today = moment();
+        // const endtime = today.add(endTime, 'days').format();
+
+        // 사진 리사이즈
         const image = req.file?.location;
+
+        console.log(req.file.location, '여기 아무도 없나?')
+        try {
+            sharp(req.file.location).resize({ width: 600 })
+            .withMetadata()
+            .toBuffer((err, buffer) => {
+                if (err) throw err;
+                fs.writeFile(req.file.location, buffer, (err) => {
+                    if (err) throw err;
+                });
+            });
+
+        } catch (err) {
+            console.log(err)
+        }
+        console.log('filename:>>>>>>>>>>>>>>>>>>' ,req.file.upload)
+
+
         const today = moment();
         const endtime = today.add(endTime, 'days').format();
         
