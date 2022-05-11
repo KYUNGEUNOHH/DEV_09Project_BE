@@ -23,22 +23,22 @@ router.post('/postadd', authMiddleware, upload.single('image'), (req, res, next)
 
         // 사진 리사이즈
         const image = req.file?.location;
+        // console.log('filename:>>>>>>>>>>>>>>>>>>', req.file)
 
-        console.log(req.file.location, '여기 아무도 없나?')
-        try {
-            sharp(req.file.location).resize({ width: 600 })
-            .withMetadata()
-            .toBuffer((err, buffer) => {
-                if (err) throw err;
-                fs.writeFile(req.file.location, buffer, (err) => {
-                    if (err) throw err;
-                });
-            });
+        // try {
+        //     sharp(req.file.location).resize({ width: 600 })
+        //     .withMetadata()
+        //     .toBuffer((err, buffer) => {
+        //         if (err) throw err;
+        //         fs.writeFile(req.file.location, buffer, (err) => {
+        //             if (err) throw err;
+        //         });
+        //     });
 
-        } catch (err) {
-            console.log(err)
-        }
-        console.log('filename:>>>>>>>>>>>>>>>>>>' ,req.file.upload)
+        // } catch (err) {
+        //     console.log(err)
+        // }
+        // console.log('filename:>>>>>>>>>>>>>>>>>>' ,req.file)
 
 
         const today = moment();
