@@ -15,10 +15,20 @@ const saltRounds = 10;
 
 // 회원가입
 router.post('/signup', (req, res, next) => {
-//     const userImages = [file:///C:/Users/moon/OneDrive/Desktop/image1.jpg,
-// ]
+    const userImages = new Array ('https://mblogthumb-phinf.pstatic.net/20140925_150/magicch1_1411626568150Ghzsi_JPEG/3.jpg?type=w2',
+                        'https://mblogthumb-phinf.pstatic.net/20140925_26/magicch1_14116265676452l2hc_JPEG/1.jpg?type=w2',
+                        'https://mblogthumb-phinf.pstatic.net/20150202_133/chaejhh_1422874976243x0rSA_JPEG/%3F%3F%3F%A5%E1%3F3_edit.jpg?type=w2',
+                        'https://mblogthumb-phinf.pstatic.net/20150202_118/chaejhh_1422874976577sPkRo_JPEG/%3F%3F%3F%3F%3F_edit.jpg?type=w2',
+                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmrtDK_WC0E0AHcQiL3ocybq_mUOIWNkxlkfNiljyPQBUIuSkOmS02T0AQT9_cbYLNq7E&usqp=CAU'
+                        )
 
-    const userImage = 'https://t1.daumcdn.net/cfile/tistory/263B293C566DA66B27';
+    // const userImage = 'https://t1.daumcdn.net/cfile/tistory/263B293C566DA66B27';
+
+    function randomImg(test){
+        return test[Math.floor(Math.random() * test.length)];
+    }
+
+    console.log(randomImg(userImages))
 
 
     const { userEmail, userName, userPassword } = req.body;
