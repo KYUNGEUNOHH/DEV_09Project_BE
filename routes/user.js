@@ -8,7 +8,7 @@ const ejs = require('ejs');
 const path = require('path');
 let appDir = path.dirname(require.main.filename);
 const upload = require('../S3/s3');
-const { PollyCustomizations } = require('aws-sdk/lib/services/polly');
+
 
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -28,8 +28,9 @@ router.post('/signup', (req, res, next) => {
         return test[Math.floor(Math.random() * test.length)];
     }
 
+    console.log(1)
     console.log(randomImg(userImages))
-
+    const userImage = randomImg(userImages)
 
     const { userEmail, userName, userPassword } = req.body;
     const param = [userEmail, userName, userPassword, userImage, 50];

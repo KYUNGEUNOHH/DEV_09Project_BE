@@ -8,8 +8,7 @@ moment.tz.setDefault('Asia/seoul');
 
 const authMiddleware = require('../middlewares/auth');
 const upload = require('../S3/s3');
-const sharp = require("sharp");
-const { fstat } = require('fs');
+
 
 //----------------메인 게시글-----------------//
 
