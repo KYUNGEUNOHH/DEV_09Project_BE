@@ -3,6 +3,7 @@ const db = require('../config');
 
 module.exports = (req, res, next) => {
     const { authorization } = req.headers;
+    console.log(authorization);
     const [authType, authToken] = authorization.split(' ');
     console.log(authorization);
 
@@ -14,7 +15,7 @@ module.exports = (req, res, next) => {
     }
 
     try {
-        const { userId } = jwt.verify(authToken, process.env.JWT_SECRET);
+        const { userId } = jwt.verify(authToken, process.env.JWT_SECRET);           
 
         const sql = 'select * from User where userId=?';
 

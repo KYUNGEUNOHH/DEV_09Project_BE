@@ -1,42 +1,52 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const routers = require('./routes');
 const fs = require('fs');
 const http = require('http');
-
-// const db = require('../config');
-// const AWS = require('aws-sdk');
 const https = require('https');
 const app = express();
 const app_http = express();
-const port = 3000;
 const httpPort = 80;
 const httpsPort = 443;
+const SocketIO = require("./socket");
 
-//소켓
-// const socketIo = require('socket.io');
-// const { Iot, Route53Domains } = require('aws-sdk');
-// const { SocketAddress } = require('net');
-// const server = require('http').createServer(app)
 
 app.use(cors());
 
+const credentials = {
+    key: fs.readFileSync(__dirname + '/private.key', 'utf8'),
+    cert: fs.readFileSync(__dirname + '/certificate.crt', 'utf8'),
+    ca: fs.readFileSync(__dirname + '/ca_bundle.crt', 'utf8'),
+};
+
 // 미들웨어 (가장 상위에 위치)
 const requestMiddleware = (req, res, next) => {
-    console.log('Request URL:', req.originalUrl, '-', new Date());
+    console.log(
+        'ip:',
+        req.ip,
+        'domain:',
+        req.rawHeaders[1],
+        'method:',
+        req.method,
+        'Request URL:',
+        req.originalUrl,
+        '-',
+        new Date(),
+    );
     next();
 };
 
-app.use(express.static('static'));
+
+app.use(helmet());
+app.use(express.static('static')); 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 app.use(requestMiddleware);
-
 app.use('/', routers);
 
 app_http.use((req, res, next) => {
@@ -59,21 +69,17 @@ app.get(
     },
 );
 
-const credentials = {
-    key: fs.readFileSync(__dirname + '/private.key', 'utf8'),
-    cert: fs.readFileSync(__dirname + '/certificate.crt', 'utf8'),
-    ca: fs.readFileSync(__dirname + '/ca_bundle.crt', 'utf8'),
-};
 
-// http.createServer(app_http).listen(httpPort, () => {
-//     console.log('http서버가 켜졌어요!');
-// });
+const httpServer = http.createServer(app_http);
+const httpsServer = https.createServer(credentials, app);
+SocketIO(httpsServer);
 
-// https.createServer(credentials, app).listen(httpsPort, () => {
-//     console.log('https서버가 켜졌어요!');
-// });
 
-// 도메인
-app.listen(port, () => {
-    console.log(port, '포트로 서버가 켜졌어요!');
+httpServer.listen(httpPort, () => {
+    console.log('http서버가 켜졌어요!');
 });
+
+httpsServer.listen(httpsPort, () => {
+    console.log('https서버가 켜졌어요!');
+});
+
